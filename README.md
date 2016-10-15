@@ -17,7 +17,7 @@ Add the plugin to your pom.xml:
           <groupId>de.enlightened</groupId>
           <artifactId>sql-enum-generator-maven-plugin</artifactId>
           <version>0.1.0</version>
-          
+
           <!-- The plugin should hook into the generate goal -->
           <executions>
             <execution>
@@ -36,7 +36,7 @@ Add the plugin to your pom.xml:
         </plugin>
       </plugin>
     </build>
-    
+
 The configuration is also made in the pom.xml. First, you will usually need a dependency on the jdbc driver for your database (in the plugin configuration, as depicted above). For example, if you use sqlite, add the following to the above dependencies:
 
     <dependency>
@@ -52,7 +52,7 @@ Next, you can add the jdbc connection parameters as required to the above config
         <user>...</user>
         <password>...</password>
       </jdbc>
-      
+
 For example:
 
     <jdbc>
@@ -65,17 +65,21 @@ Now for the interesting part: The generator configuration. By default, the enums
           <package>de.enlightened.sqlenum</package>
           <directory>target/generated-sources/sql-enum</directory>
         </target>
-        
+
 At last, you specify the enums to be generated:
 
       <database>
         <enum>
           <name>Enumname</name>
           <table>tablename</table>
-          <idColumn>columnname</idColumn>
-          <nameColumn>columnname</nameColumn>
+          <valueColumn>columnname</valueColumn>
         </enum>
         ...
       </database>
 
-This will generate an enum with the specified name from the specified table records.
+This will generate an enum with the specified name from the specified table records. By default, the first column whose sql type has a string representation in java will be chosen for naming the enum values. This can be overriden by explicitly setting the 'valueColumn'. All other columns will be used to populate properties of the enum.
+
+Multiple enums can be configured.
+
+
+

@@ -155,30 +155,19 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
       if (!SqlType.valueOf(column.getType()).getJavaClass().equals(String.class)) {
         throw new MojoFailureException(String.format("Only column for enum %s must have String representation (for enum name).", enumCfg.getName()));
       }
-      if (enumCfg.getNameColumn() == null) {
-        enumCfg.setNameColumn(columns.getValue(0).getName());
-        enumCfg.setIdColumn(columns.getValue(0).getName());
+      if (enumCfg.getValueColumn() == null) {
+        enumCfg.setValueColumn(columns.getValue(0).getName());
       }
     } else {
-      if (enumCfg.getIdColumn() == null) {
-        if (columns.containsKey("ID")) {
-          enumCfg.setIdColumn("ID");
-        } else {
-          enumCfg.setIdColumn(columns.getValue(0).getName());
+      if (enumCfg.getValueColumn() == null) {
+        for (final Column column : columns.values()) {
+          if (column.getType().equals("VARCHAR")) {
+            enumCfg.setValueColumn(column.getName());
+            break;
+          }
         }
-      }
-      if (enumCfg.getNameColumn() == null) {
-        if (columns.get(enumCfg.getIdColumn()).getType().equals("VARCHAR")) {
-          enumCfg.setNameColumn(enumCfg.getIdColumn());
-        } else {
-          for (final Column column : columns.values()) {
-            if (column.getType().equals("VARCHAR")) {
-              enumCfg.setNameColumn(column.getName());
-            }
-          }
-          if (enumCfg.getNameColumn() == null) {
-            throw new MojoFailureException(String.format("Enum %s must have at least one column with String representation (for enum name).", enumCfg.getName()));
-          }
+        if (enumCfg.getValueColumn() == null) {
+          throw new MojoFailureException(String.format("Enum %s must have at least one column with String representation (for enum name).", enumCfg.getName()));
         }
       }
     }
@@ -243,7 +232,7 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
   private EnumRepr generateEnumRepr(final Connection connection, final EnumCfg enumCfg, final LinkedMap<String, Column> columns) throws MojoFailureException, SQLException {
     final EnumRepr enumRepr = new EnumRepr(enumCfg.getName());
     for (final Column column : columns.values()) {
-      if (!column.getName().equals(enumCfg.getNameColumn())) {
+      if (!column.getName().equals(enumCfg.getValueColumn())) {
         enumRepr.addMember(column.getName(), SqlType.valueOf(column.getType()));
       }
     }
@@ -253,7 +242,7 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
         ResultSet result = stmt.executeQuery()
     ) {
       while (result.next()) {
-        final String name = result.getString(enumCfg.getNameColumn());
+        final String name = result.getString(enumCfg.getValueColumn());
         if (enumRepr.hasValue(name)) {
           throw new MojoFailureException(String.format("Duplicate enum entry '%s' for enum %s.", name, enumRepr.getName()));
         }
