@@ -34,14 +34,9 @@ public class EnumCfg {
   private String table;
 
   /**
-   * The column to generate the enum name from
+   * The column to generate the enum value from
    */
-  private String nameColumn;
-
-  /**
-   * The column to generate the enum id from
-   */
-  private String idColumn;
+  private String valueColumn;
 
   public EnumCfg() {
   }
@@ -62,22 +57,13 @@ public class EnumCfg {
     this.table = table;
   }
 
-  public final String getNameColumn() {
-    return this.nameColumn;
+  public final String getValueColumn() {
+    return this.valueColumn;
   }
 
-  public final void setNameColumn(final String nameColumn) {
-    this.nameColumn = nameColumn;
+  public final void setValueColumn(final String valueColumn) {
+    this.valueColumn = valueColumn;
   }
-
-  public final String getIdColumn() {
-    return this.idColumn;
-  }
-
-  public final void setIdColumn(final String idColumn) {
-    this.idColumn = idColumn;
-  }
-
 
   private static final int HASH_BASE = 7;
 
@@ -88,8 +74,7 @@ public class EnumCfg {
     int hash = HASH_BASE;
     hash = HASH_FACTOR * hash + Objects.hashCode(this.name);
     hash = HASH_FACTOR * hash + Objects.hashCode(this.table);
-    hash = HASH_FACTOR * hash + Objects.hashCode(this.nameColumn);
-    hash = HASH_FACTOR * hash + Objects.hashCode(this.idColumn);
+    hash = HASH_FACTOR * hash + Objects.hashCode(this.valueColumn);
     return hash;
   }
 
@@ -111,10 +96,7 @@ public class EnumCfg {
     if (!Objects.equals(this.table, other.table)) {
       return false;
     }
-    if (!Objects.equals(this.nameColumn, other.nameColumn)) {
-      return false;
-    }
-    if (!Objects.equals(this.idColumn, other.idColumn)) {
+    if (!Objects.equals(this.valueColumn, other.valueColumn)) {
       return false;
     }
     return true;
@@ -122,6 +104,6 @@ public class EnumCfg {
 
   @Override
   public final String toString() {
-    return "EnumCfg{" + "name=" + name + ", table=" + table + ", nameColumn=" + nameColumn + ", idColumn=" + idColumn + '}';
+    return "EnumCfg{" + "name=" + name + ", table=" + table + ", valueColumn=" + valueColumn + '}';
   }
 }

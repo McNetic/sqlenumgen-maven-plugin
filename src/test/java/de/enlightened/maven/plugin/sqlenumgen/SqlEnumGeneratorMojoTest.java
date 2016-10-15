@@ -148,8 +148,7 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
 
     final EnumCfg expectedEnumCfg = new EnumCfg();
     expectedEnumCfg.setName("TestEnum");
-    expectedEnumCfg.setNameColumn("name");
-    expectedEnumCfg.setIdColumn("name");
+    expectedEnumCfg.setValueColumn("name");
 
     assertEquals("enumCfg is returned", expectedEnumCfg, actualEnumCfg);
   }
@@ -167,8 +166,7 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
 
     final EnumCfg expectedEnumCfg = new EnumCfg();
     expectedEnumCfg.setName("TestEnum");
-    expectedEnumCfg.setNameColumn("name");
-    expectedEnumCfg.setIdColumn("id");
+    expectedEnumCfg.setValueColumn("name");
 
     assertEquals("enumCfg is returned", expectedEnumCfg, actualEnumCfg);
   }
@@ -179,7 +177,6 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
 
     final EnumCfg enumCfgIn = new EnumCfg();
     enumCfgIn.setName("TestEnum");
-    enumCfgIn.setIdColumn("id");
     final LinkedMap<String, Column> columns = new LinkedMap<>();
     columns.put("id", new Column("id", "INTEGER"));
     columns.put("name", new Column("name", "VARCHAR"));
@@ -187,8 +184,7 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
 
     final EnumCfg expectedEnumCfg = new EnumCfg();
     expectedEnumCfg.setName("TestEnum");
-    expectedEnumCfg.setNameColumn("name");
-    expectedEnumCfg.setIdColumn("id");
+    expectedEnumCfg.setValueColumn("name");
 
     assertEquals("enumCfg is returned", expectedEnumCfg, actualEnumCfg);
   }
@@ -199,7 +195,6 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
 
     final EnumCfg enumCfgIn = new EnumCfg();
     enumCfgIn.setName("TestEnum");
-    enumCfgIn.setIdColumn("id");
     final LinkedMap<String, Column> columns = new LinkedMap<>();
     columns.put("id", new Column("id", "VARCHAR"));
     columns.put("name", new Column("name", "VARCHAR"));
@@ -207,8 +202,7 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
 
     final EnumCfg expectedEnumCfg = new EnumCfg();
     expectedEnumCfg.setName("TestEnum");
-    expectedEnumCfg.setNameColumn("id");
-    expectedEnumCfg.setIdColumn("id");
+    expectedEnumCfg.setValueColumn("id");
 
     assertEquals("enumCfg is returned", expectedEnumCfg, actualEnumCfg);
   }
