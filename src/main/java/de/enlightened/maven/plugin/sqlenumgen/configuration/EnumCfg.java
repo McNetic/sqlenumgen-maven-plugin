@@ -29,6 +29,11 @@ public class EnumCfg {
   private String name;
 
   /**
+   * The column to generate the enum name from
+   */
+  private String nameColumn;
+
+  /**
    * The database table to generate the enum from
    */
   private String table;
@@ -47,6 +52,14 @@ public class EnumCfg {
 
   public final void setName(final String name) {
     this.name = name;
+  }
+
+  public final String getNameColumn() {
+    return nameColumn;
+  }
+
+  public final void setNameColumn(final String nameColumn) {
+    this.nameColumn = nameColumn;
   }
 
   public final String getTable() {
@@ -73,6 +86,7 @@ public class EnumCfg {
   public final int hashCode() {
     int hash = HASH_BASE;
     hash = HASH_FACTOR * hash + Objects.hashCode(this.name);
+    hash = HASH_FACTOR * hash + Objects.hashCode(this.nameColumn);
     hash = HASH_FACTOR * hash + Objects.hashCode(this.table);
     hash = HASH_FACTOR * hash + Objects.hashCode(this.valueColumn);
     return hash;
@@ -93,6 +107,9 @@ public class EnumCfg {
     if (!Objects.equals(this.name, other.name)) {
       return false;
     }
+    if (!Objects.equals(this.nameColumn, other.nameColumn)) {
+      return false;
+    }
     if (!Objects.equals(this.table, other.table)) {
       return false;
     }
@@ -104,6 +121,6 @@ public class EnumCfg {
 
   @Override
   public final String toString() {
-    return "EnumCfg{" + "name=" + name + ", table=" + table + ", valueColumn=" + valueColumn + '}';
+    return "EnumCfg{" + "name=" + name + ", nameColumn=" + nameColumn + ", table=" + table + ", valueColumn=" + valueColumn + "}";
   }
 }

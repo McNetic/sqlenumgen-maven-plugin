@@ -23,9 +23,9 @@ public class Column {
 
   private final String name;
 
-  private final String type;
+  private final SqlType type;
 
-  public Column(final String name, final String type) {
+  public Column(final String name, final SqlType type) {
     this.name = name;
     this.type = type;
   }
@@ -34,7 +34,7 @@ public class Column {
     return this.name;
   }
 
-  public final String getType() {
+  public final SqlType getType() {
     return this.type;
   }
 }

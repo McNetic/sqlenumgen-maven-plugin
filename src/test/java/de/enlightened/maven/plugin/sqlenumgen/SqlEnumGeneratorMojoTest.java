@@ -21,14 +21,19 @@ import de.enlightened.maven.plugin.sqlenumgen.configuration.Configuration;
 import de.enlightened.maven.plugin.sqlenumgen.configuration.DatabaseCfg;
 import de.enlightened.maven.plugin.sqlenumgen.configuration.EnumCfg;
 import de.enlightened.maven.plugin.sqlenumgen.util.Column;
+import de.enlightened.maven.plugin.sqlenumgen.util.SqlType;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
@@ -143,7 +148,7 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
     final EnumCfg enumCfgIn = new EnumCfg();
     enumCfgIn.setName("TestEnum");
     final LinkedMap<String, Column> columns = new LinkedMap<>();
-    columns.put("name", new Column("name", "VARCHAR"));
+    columns.put("name", new Column("name", SqlType.VARCHAR));
     final EnumCfg actualEnumCfg = (EnumCfg) Whitebox.invokeMethod(mojo, "completeEnumCfgFromColumns", enumCfgIn, columns);
 
     final EnumCfg expectedEnumCfg = new EnumCfg();
@@ -160,8 +165,8 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
     final EnumCfg enumCfgIn = new EnumCfg();
     enumCfgIn.setName("TestEnum");
     final LinkedMap<String, Column> columns = new LinkedMap<>();
-    columns.put("id", new Column("id", "INTEGER"));
-    columns.put("name", new Column("name", "VARCHAR"));
+    columns.put("id", new Column("id", SqlType.INTEGER));
+    columns.put("name", new Column("name", SqlType.VARCHAR));
     final EnumCfg actualEnumCfg = (EnumCfg) Whitebox.invokeMethod(mojo, "completeEnumCfgFromColumns", enumCfgIn, columns);
 
     final EnumCfg expectedEnumCfg = new EnumCfg();
@@ -178,8 +183,8 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
     final EnumCfg enumCfgIn = new EnumCfg();
     enumCfgIn.setName("TestEnum");
     final LinkedMap<String, Column> columns = new LinkedMap<>();
-    columns.put("id", new Column("id", "INTEGER"));
-    columns.put("name", new Column("name", "VARCHAR"));
+    columns.put("id", new Column("id", SqlType.INTEGER));
+    columns.put("name", new Column("name", SqlType.VARCHAR));
     final EnumCfg actualEnumCfg = (EnumCfg) Whitebox.invokeMethod(mojo, "completeEnumCfgFromColumns", enumCfgIn, columns);
 
     final EnumCfg expectedEnumCfg = new EnumCfg();
@@ -196,8 +201,8 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
     final EnumCfg enumCfgIn = new EnumCfg();
     enumCfgIn.setName("TestEnum");
     final LinkedMap<String, Column> columns = new LinkedMap<>();
-    columns.put("id", new Column("id", "VARCHAR"));
-    columns.put("name", new Column("name", "VARCHAR"));
+    columns.put("id", new Column("id", SqlType.VARCHAR));
+    columns.put("name", new Column("name", SqlType.VARCHAR));
     final EnumCfg actualEnumCfg = (EnumCfg) Whitebox.invokeMethod(mojo, "completeEnumCfgFromColumns", enumCfgIn, columns);
 
     final EnumCfg expectedEnumCfg = new EnumCfg();
@@ -208,16 +213,39 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
   }
 
   @Test
+  public void testcompleteEnumCfgFromColumns5() throws Exception {
+    mojo = new SqlEnumGeneratorMojo();
+
+    final EnumCfg enumCfgIn = new EnumCfg();
+    enumCfgIn.setName("TestEnum");
+    enumCfgIn.setNameColumn("NameColumn");
+    final LinkedMap<String, Column> columns = new LinkedMap<>();
+    columns.put("id", new Column("id", SqlType.VARCHAR));
+    columns.put("name", new Column("name", SqlType.VARCHAR));
+    columns.put("NameColumn", new Column("NameColumn", SqlType.VARCHAR));
+    final EnumCfg actualEnumCfg = (EnumCfg) Whitebox.invokeMethod(mojo, "completeEnumCfgFromColumns", enumCfgIn, columns);
+
+    final EnumCfg expectedEnumCfg = new EnumCfg();
+    expectedEnumCfg.setName("TestEnum");
+    expectedEnumCfg.setNameColumn("NameColumn");
+    expectedEnumCfg.setValueColumn("id");
+
+    assertEquals("enumCfg is returned", expectedEnumCfg, actualEnumCfg);
+    assertEquals("columns size reduced", 2, columns.size());
+    assertEquals("NameColumn removed from colums", -1, columns.indexOf("NameColumn"));
+  }
+
+  @Test
   public void testcompleteEnumCfgFromColumnsFailNoStringColumn1() throws Exception {
     mojo = new SqlEnumGeneratorMojo();
 
     final EnumCfg enumCfgIn = new EnumCfg();
     enumCfgIn.setName("TestEnum");
     final LinkedMap<String, Column> columns = new LinkedMap<>();
-    columns.put("name", new Column("name", "INTEGER"));
+    columns.put("name", new Column("name", SqlType.INTEGER));
 
     exception.expect(MojoFailureException.class);
-    exception.expectMessage("Only column for enum TestEnum must have String representation (for enum name).");
+    exception.expectMessage("Only column for enum TestEnum must have String representation (for enum value).");
     Whitebox.invokeMethod(mojo, "completeEnumCfgFromColumns", enumCfgIn, columns);
   }
 
@@ -228,11 +256,44 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
     final EnumCfg enumCfgIn = new EnumCfg();
     enumCfgIn.setName("TestEnum");
     final LinkedMap<String, Column> columns = new LinkedMap<>();
-    columns.put("id", new Column("name", "INTEGER"));
-    columns.put("name", new Column("name", "INTEGER"));
+    columns.put("id", new Column("name", SqlType.INTEGER));
+    columns.put("name", new Column("name", SqlType.INTEGER));
 
     exception.expect(MojoFailureException.class);
-    exception.expectMessage("Enum TestEnum must have at least one column with String representation (for enum name).");
+    exception.expectMessage("Enum TestEnum must have at least one column with String representation (for enum value).");
+    Whitebox.invokeMethod(mojo, "completeEnumCfgFromColumns", enumCfgIn, columns);
+  }
+
+  @Test
+  public void testcompleteEnumCfgFromColumnsFailNoNameColumn() throws Exception {
+    mojo = new SqlEnumGeneratorMojo();
+
+    final EnumCfg enumCfgIn = new EnumCfg();
+    enumCfgIn.setName("name");
+    enumCfgIn.setNameColumn("TestColumn");
+    final LinkedMap<String, Column> columns = new LinkedMap<>();
+    columns.put("id", new Column("name", SqlType.VARCHAR));
+    columns.put("name", new Column("name", SqlType.VARCHAR));
+
+    exception.expect(MojoFailureException.class);
+    exception.expectMessage("Configured nameColumn missing for enum name.");
+    Whitebox.invokeMethod(mojo, "completeEnumCfgFromColumns", enumCfgIn, columns);
+  }
+
+  @Test
+  public void testcompleteEnumCfgFromColumnsFailNameColumnNotString() throws Exception {
+    mojo = new SqlEnumGeneratorMojo();
+
+    final EnumCfg enumCfgIn = new EnumCfg();
+    enumCfgIn.setName("name");
+    enumCfgIn.setNameColumn("TestColumn");
+    final LinkedMap<String, Column> columns = new LinkedMap<>();
+    columns.put("id", new Column("name", SqlType.VARCHAR));
+    columns.put("name", new Column("name", SqlType.VARCHAR));
+    columns.put("TestColumn", new Column("TestColumn", SqlType.INTEGER));
+
+    exception.expect(MojoFailureException.class);
+    exception.expectMessage("Configured nameColumn TestColumn for enum must have String representation (for enum name).");
     Whitebox.invokeMethod(mojo, "completeEnumCfgFromColumns", enumCfgIn, columns);
   }
 
@@ -247,6 +308,27 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
     exception.expect(MojoFailureException.class);
     exception.expectMessage("No columns found for enum TestEnum.");
     Whitebox.invokeMethod(mojo, "completeEnumCfgFromColumns", enumCfgIn, columns);
+  }
+
+  public void testReadEnumNamesFromDB() throws SQLException, Exception {
+    mojo = new SqlEnumGeneratorMojo();
+
+    final Connection connection = mock(Connection.class);
+    final PreparedStatement stmt = mock(PreparedStatement.class);
+    final ResultSet result = mock(ResultSet.class);
+    when(result.next()).thenReturn(true).thenReturn(true).thenReturn(false);
+    when(result.getString("nameColumn")).thenReturn("name1").thenReturn("name2");
+    when(stmt.executeQuery()).thenReturn(result);
+    when(connection.prepareStatement("SELECT DISTINCT nameColumn FROM table")).thenReturn(stmt);
+
+    final EnumCfg enumCfg = new EnumCfg();
+    enumCfg.setNameColumn("nameColumn");
+    enumCfg.setTable("table");
+
+    final List<String> enumNames = (List<String>) Whitebox.invokeMethod(mojo, "readEnumNamesFromDB", connection, enumCfg);
+    assertTrue(enumNames.contains("name1"));
+    assertTrue(enumNames.contains("name2"));
+    assertEquals("enum names size", 2, enumNames.size());
   }
 
   @Test

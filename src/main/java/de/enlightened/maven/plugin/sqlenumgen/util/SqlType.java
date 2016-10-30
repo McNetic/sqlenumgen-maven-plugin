@@ -16,47 +16,64 @@
 package de.enlightened.maven.plugin.sqlenumgen.util;
 
 import java.math.BigDecimal;
+import java.sql.Types;
 
 /**
  *
  * @author Nicolai Ehemann
  */
 public enum SqlType {
-  VARCHAR(String.class, "\"%s\""),
-  CHAR(String.class, "\"%s\""),
-  LONGVARCHAR(String.class, "\"%s\""),
-  BIT(Boolean.class),
-  NUMERIC(BigDecimal.class, "new BigDecimal(\"%s\")"),
-  BIGDECIMAL(BigDecimal.class, "new BigDecimal(\"%s\")"),
-  TINYINT(Byte.class),
-  SMALLINT(Short.class),
-  INTEGER(Integer.class),
-  BIGINT(Long.class),
-  REAL(Float.class),
-  FLOAT(Float.class),
-  DOUBLE(Double.class),
-  DATE(java.sql.Date.class),
-  TIME(java.sql.Time.class),
-  TIMESTAMP(java.sql.Timestamp.class);
+  VARCHAR(Types.VARCHAR, String.class, "\"%s\""),
+  CHAR(Types.VARCHAR, String.class, "\"%s\""),
+  LONGVARCHAR(Types.VARCHAR, String.class, "\"%s\""),
+  NUMERIC(Types.NUMERIC, BigDecimal.class, "new BigDecimal(\"%s\")"),
+  DECIMAL(Types.DECIMAL, BigDecimal.class, "new BigDecimal(\"%s\")"),
+  BIT(Types.BIT, Boolean.class),
+  TINYINT(Types.TINYINT, Byte.class),
+  SMALLINT(Types.SMALLINT, Short.class),
+  INTEGER(Types.INTEGER, Integer.class),
+  BIGINT(Types.BIGINT, Long.class),
+  REAL(Types.REAL, Float.class),
+  FLOAT(Types.FLOAT, Double.class),
+  DOUBLE(Types.DOUBLE, Double.class),
+  DATE(Types.DATE, java.sql.Date.class),
+  TIME(Types.TIME, java.sql.Time.class),
+  TIMESTAMP(Types.TIMESTAMP, java.sql.Timestamp.class);
+
+  private final int sqlType;
 
   private final Class javaClass;
 
   private final String literalFormat;
 
-  SqlType(final Class javaClass, final String literalFormat) {
+  SqlType(final int sqlType, final Class javaClass, final String literalFormat) {
+    this.sqlType = sqlType;
     this.javaClass = javaClass;
     this.literalFormat = literalFormat;
   }
 
-  SqlType(final Class javaClass) {
-    this(javaClass, "%s");
+  SqlType(final int sqlType, final Class javaClass) {
+    this(sqlType, javaClass, "%s");
+  }
+
+  public final int getSqlType() {
+    return this.sqlType;
   }
 
   public final Class getJavaClass() {
     return this.javaClass;
   }
 
-  public String getLiteralFormat() {
+  public final String getLiteralFormat() {
     return this.literalFormat;
+  }
+
+  public static SqlType valueOf(final int type) {
+    for (SqlType sqlType : SqlType.values()) {
+      if (sqlType.getSqlType() == type) {
+        return sqlType;
+      }
+    }
+    throw new IllegalArgumentException(String.format("No SqlType enum representation for int %d", type));
   }
 }
