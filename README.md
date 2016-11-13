@@ -3,9 +3,13 @@ Maven plugin to generate java enums from sql database table(s)
 
 ## Abstract
 
-Often, database-backed applications require so called 'master data' tables, containing a few data records that are runtime constant. In Java, such master data is represented by enums.
+Often, database-backed applications require so called 'master data' tables,
+containing a few data records that are runtime constant. In Java, such master
+data is represented by enums.
 
-To avoid having to manually synchronize the generation of the database tables/records and corresponding enum types, this maven plugin allows to generate the enums automatically from existing database tables via jdbc.
+To avoid having to manually synchronize the generation of the database
+tables/records and corresponding enum types, this maven plugin allows to
+generate the enums automatically from existing database tables via jdbc.
 
 ## Usage
 
@@ -37,7 +41,10 @@ Add the plugin to your pom.xml:
       </plugin>
     </build>
 
-The configuration is also made in the pom.xml. First, you will usually need a dependency on the jdbc driver for your database (in the plugin configuration, as depicted above). For example, if you use sqlite, add the following to the above dependencies:
+The configuration is also made in the pom.xml. First, you will usually need a
+dependency on the jdbc driver for your database (in the plugin configuration,
+as depicted above). For example, if you use sqlite, add the following to the
+above dependencies:
 
     <dependency>
       <groupId>org.xerial</groupId>
@@ -45,7 +52,8 @@ The configuration is also made in the pom.xml. First, you will usually need a de
       <version>3.8.11.2</version>
     </dependency>
 
-Next, you can add the jdbc connection parameters as required to the above configuration:
+Next, you can add the jdbc connection parameters as required to the above
+configuration:
 
       <jdbc>
         <url>...</url>
@@ -59,7 +67,9 @@ For example:
       <url>jdbc:sqlite:test.db</url>
     </jdbc>
 
-Now for the interesting part: The generator configuration. By default, the enums will be generated in a package `de.enlightened.sqlenum` in the directory `target/generated-sources/sql-enum`. You can override both:
+Now for the interesting part: The generator configuration. By default, the enums
+will be generated in a package `de.enlightened.sqlenum` in the directory
+`target/generated-sources/sql-enum`. You can override both:
 
         <target>
           <package>de.enlightened.sqlenum</package>
@@ -77,7 +87,11 @@ At last, you specify the enums to be generated:
         ...
       </database>
 
-This will generate an enum with the specified name from the specified table records. By default, the first column whose sql type has a string representation in java will be chosen for naming the enum values. This can be overriden by explicitly setting the 'valueColumn'. All other columns will be used to populate properties of the enum.
+This will generate an enum with the specified name from the specified table
+records. By default, the first column whose sql type has a string representation
+in java will be chosen for naming the enum values. This can be overriden by
+explicitly setting the 'valueColumn'. All other columns will be used to populate
+properties of the enum.
 
 Multiple enums can be configured.
 
