@@ -34,6 +34,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
@@ -310,6 +311,18 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
     Whitebox.invokeMethod(mojo, "completeEnumCfgFromColumns", enumCfgIn, columns);
   }
 
+  public void testStringToJavaIdentifier() throws Exception {
+    mojo = new SqlEnumGeneratorMojo();
+
+    final String[] inputString = {"Abcdef", ".bcdef", "A.cdef", "A_cdef", "50 %"};
+    final String[] expectedJavaIdentifier = {"Abcdef", "_46_bcdef", "A_46_cdef", "A__cdef", "_53_0_32__37_"};
+
+    for (int i = 0; i < inputString.length; i++) {
+      String actualJavaIdentifier = (String) Whitebox.invokeMethod(mojo, "stringToJavaIdentifier", inputString[i]);
+      assertEquals(expectedJavaIdentifier[i], actualJavaIdentifier);
+    }
+  }
+
   public void testReadEnumNamesFromDB() throws SQLException, Exception {
     mojo = new SqlEnumGeneratorMojo();
 
@@ -325,9 +338,11 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
     enumCfg.setNameColumn("nameColumn");
     enumCfg.setTable("table");
 
-    final List<String> enumNames = (List<String>) Whitebox.invokeMethod(mojo, "readEnumNamesFromDB", connection, enumCfg);
-    assertTrue(enumNames.contains("name1"));
-    assertTrue(enumNames.contains("name2"));
+    final Map<String, String> enumNames = (Map<String, String>) Whitebox.invokeMethod(mojo, "readEnumNamesFromDB", connection, enumCfg);
+    assertTrue(enumNames.containsKey("name1"));
+    assertEquals(enumNames.get("name1"), "name1");
+    assertTrue(enumNames.containsKey("name2"));
+    assertEquals(enumNames.get("name2"), "name2");
     assertEquals("enum names size", 2, enumNames.size());
   }
 

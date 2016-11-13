@@ -39,10 +39,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.map.LinkedMap;
 
@@ -118,14 +115,16 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
       for (final EnumCfg enumCfg : this.generator.getDatabase().getEnums()) {
         final LinkedMap<String, Column> columns = readColumnsFromDB(connection, enumCfg);
         this.completeEnumCfgFromColumns(enumCfg, columns);
-        final List<String> enumNames;
+        final Map<String, String> enumNames;
         if (enumCfg.getNameColumn() == null) {
-          enumNames = Arrays.asList(enumCfg.getName());
+          enumNames = new HashMap<>();
+          enumNames.put(enumCfg.getName(), enumCfg.getName());
         } else {
           enumNames = this.readEnumNamesFromDB(connection, enumCfg);
         }
-        for (final String enumName : enumNames) {
-          enumCfg.setName(enumName);
+        for (final String escapedEnumName : enumNames.keySet()) {
+          enumCfg.setName(enumNames.get(escapedEnumName));
+          enumCfg.setEscapedName(escapedEnumName);
           final EnumRepr enumRepr = this.generateEnumRepr(connection, enumCfg, columns);
 
           final VelocityContext context = this.createContext(enumRepr);
@@ -253,25 +252,42 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
         this.generator.getTarget().getPackage().replace('.', '/'));
   }
 
-  private List<String> readEnumNamesFromDB(final Connection connection, final EnumCfg enumCfg) throws SQLException {
-    final List<String> enumNames = new ArrayList<>();
+  private String stringToJavaIdentifier(final String str) {
+    final StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < str.length(); i++) {
+        if (str.charAt(i) == '_') {
+          sb.append("__");
+        } else if ((i == 0 && Character.isJavaIdentifierStart(str.charAt(i))) || (i > 0 && Character.isJavaIdentifierPart(str.charAt(i)))) {
+            sb.append(str.charAt(i));
+        } else {
+            sb.append("_").append(str.codePointAt(i)).append("_");
+        }
+    }
+    return sb.toString();
+  }
+
+  private Map<String, String> readEnumNamesFromDB(final Connection connection, final EnumCfg enumCfg) throws SQLException, MojoFailureException {
+    final Map<String, String> enumNames = new HashMap<>();
     try (
       PreparedStatement stmt = connection.prepareStatement("SELECT DISTINCT " + enumCfg.getNameColumn() + " FROM " + enumCfg.getTable());
       ResultSet result = stmt.executeQuery();
     ) {
       while (result.next()) {
-        enumNames.add(result.getString(enumCfg.getNameColumn()));
+        final String enumName = result.getString(enumCfg.getNameColumn());
+        final String escapedEnumName = this.stringToJavaIdentifier(enumName);
+        if (enumNames.containsKey(escapedEnumName)) {
+          throw new MojoFailureException(String.format("Ambiguous nameColumn entries (for enum %s).", enumCfg.getName()));
+        }
+        enumNames.put(escapedEnumName, enumName);
       }
     }
     return enumNames;
   }
 
   private EnumRepr generateEnumRepr(final Connection connection, final EnumCfg enumCfg, final LinkedMap<String, Column> columns) throws MojoFailureException, SQLException {
-    final EnumRepr enumRepr = new EnumRepr(enumCfg.getName());
+    final EnumRepr enumRepr = new EnumRepr(enumCfg.getEscapedName());
     for (final Column column : columns.values()) {
-      if (!column.getName().equals(enumCfg.getValueColumn())) {
-        enumRepr.addMember(column.getName(), column.getType());
-      }
+      enumRepr.addMember(column.getName(), column.getType());
     }
     final String condition;
     if (enumCfg.getNameColumn() == null) {
@@ -286,7 +302,8 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
     ) {
       while (result.next()) {
         final String value = result.getString(enumCfg.getValueColumn());
-        if (enumRepr.hasValue(value)) {
+        final String escapedValue = stringToJavaIdentifier(value);
+        if (enumRepr.hasValue(escapedValue)) {
           throw new MojoFailureException(String.format("Duplicate enum entry '%s' for enum %s.", value, enumRepr.getName()));
         }
         final Map<String, String> memberValues = new HashMap<String, String>();
@@ -298,7 +315,7 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
             memberValues.put(member.getName(), String.format(columns.get(member.getName()).getType().getLiteralFormat(), memberValue.toString()));
           }
         }
-        enumRepr.addValue(new ValueRepr(value, memberValues));
+        enumRepr.addValue(new ValueRepr(escapedValue, memberValues));
       }
     }
     return enumRepr;
@@ -309,7 +326,6 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
       final DatabaseMetaData metaData = connection.getMetaData();
       try (ResultSet result = metaData.getColumns(null, this.generator.getDatabaseSchema(), enumCfg.getTable(), null)) {
         while (result.next()) {
-          System.out.println("TPYE" + result.getString("DATA_TYPE"));
           final Column column = new Column(result.getString("COLUMN_NAME"), SqlType.valueOf(result.getInt("DATA_TYPE")));
           columns.put(column.getName(), column);
         }

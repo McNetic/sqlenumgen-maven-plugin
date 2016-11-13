@@ -36,11 +36,13 @@ public class EnumCfgTest {
   public void setUp() {
     enumCfg1 = new EnumCfg();
     enumCfg1.setName("name1");
+    enumCfg1.setEscapedName("escapedName1");
     enumCfg1.setNameColumn("nameColumn1");
     enumCfg1.setTable("table1");
     enumCfg1.setValueColumn("valueColumn1");
     enumCfg2 = new EnumCfg();
     enumCfg2.setName("name1");
+    enumCfg2.setEscapedName("escapedName1");
     enumCfg2.setNameColumn("nameColumn1");
     enumCfg2.setTable("table1");
     enumCfg2.setValueColumn("valueColumn1");
@@ -51,16 +53,19 @@ public class EnumCfgTest {
     enumCfg3.setValueColumn("valueColumn1");
     enumCfg4 = new EnumCfg();
     enumCfg4.setName("name1");
+    enumCfg4.setEscapedName("escapedName1");
     enumCfg4.setNameColumn(null);
     enumCfg4.setTable("table1");
     enumCfg4.setValueColumn("valueColumn1");
     enumCfg5 = new EnumCfg();
     enumCfg5.setName("name1");
+    enumCfg5.setEscapedName("escapedName1");
     enumCfg5.setNameColumn("nameColumn1");
     enumCfg5.setTable(null);
     enumCfg5.setValueColumn("valueColumn1");
     enumCfg6 = new EnumCfg();
     enumCfg6.setName("name1");
+    enumCfg6.setEscapedName("escapedName1");
     enumCfg6.setNameColumn("nameColumn1");
     enumCfg6.setTable("table1");
     enumCfg6.setValueColumn(null);
@@ -132,6 +137,7 @@ public class EnumCfgTest {
   public void testToString() {
     assertEquals("EnumCfg{" +
         "name=" + enumCfg1.getName() +
+        ", escapedName=" + enumCfg1.getEscapedName() +
         ", nameColumn=" + enumCfg1.getNameColumn() +
         ", table=" + enumCfg1.getTable() +
         ", valueColumn=" + enumCfg1.getValueColumn() + "}",
