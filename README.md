@@ -20,7 +20,7 @@ Add the plugin to your pom.xml:
         <plugin>
           <groupId>de.enlightened</groupId>
           <artifactId>sql-enum-generator-maven-plugin</artifactId>
-          <version>0.1.0</version>
+          <version>0.2.0</version>
 
           <!-- The plugin should hook into the generate goal -->
           <executions>
@@ -95,5 +95,9 @@ properties of the enum.
 
 Multiple enums can be configured.
 
-
+It is also possible to have multiple enums generated from one table. In this
+case, one column has to be specified as nameColumn
+(`<nameColumn>columnname</nameColumn>`). All rows with the same value in this
+column will be used for generating values in an enum, whose name is the
+value of the name column.
 
