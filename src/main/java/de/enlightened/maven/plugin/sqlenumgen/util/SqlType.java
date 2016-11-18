@@ -17,6 +17,7 @@ package de.enlightened.maven.plugin.sqlenumgen.util;
 
 import java.math.BigDecimal;
 import java.sql.Types;
+import org.apache.commons.lang.StringEscapeUtils;
 
 /**
  *
@@ -32,13 +33,13 @@ public enum SqlType {
   TINYINT(Types.TINYINT, Byte.class),
   SMALLINT(Types.SMALLINT, Short.class),
   INTEGER(Types.INTEGER, Integer.class),
-  BIGINT(Types.BIGINT, Long.class),
-  REAL(Types.REAL, Float.class),
-  FLOAT(Types.FLOAT, Double.class),
-  DOUBLE(Types.DOUBLE, Double.class),
-  DATE(Types.DATE, java.sql.Date.class),
-  TIME(Types.TIME, java.sql.Time.class),
-  TIMESTAMP(Types.TIMESTAMP, java.sql.Timestamp.class);
+  BIGINT(Types.BIGINT, Long.class, "%sL"),
+  REAL(Types.REAL, Float.class, "%sF"),
+  FLOAT(Types.FLOAT, Double.class, "%sF"),
+  DOUBLE(Types.DOUBLE, Double.class, "%sD"),
+  DATE(Types.DATE, java.sql.Date.class, "Date.valueOf(\"%s\")"),
+  TIME(Types.TIME, java.sql.Time.class, "Time.valueOf(\"%s\")"),
+  TIMESTAMP(Types.TIMESTAMP, java.sql.Timestamp.class, "Timestamp.valueOf(\"%s\")");
 
   private final int sqlType;
 
@@ -75,5 +76,13 @@ public enum SqlType {
       }
     }
     throw new IllegalArgumentException(String.format("No SqlType enum representation for int %d", type));
+  }
+
+  public String generateLiteral(final Object value) {
+    if (value == null) {
+      return "null";
+    } else {
+      return String.format(this.literalFormat, StringEscapeUtils.escapeJava(value.toString()));
+    }
   }
 }

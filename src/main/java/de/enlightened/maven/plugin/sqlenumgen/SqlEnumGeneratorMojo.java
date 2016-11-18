@@ -158,7 +158,7 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
 
   private EnumCfg completeEnumCfgFromColumns(final EnumCfg enumCfg, final LinkedMap<String, Column> columns) throws MojoFailureException, SQLException {
 
-    if (columns.size() == 0) {
+    if (columns.isEmpty()) {
       throw new MojoFailureException(String.format("No columns found for enum %s.", enumCfg.getName()));
     }
 
@@ -178,7 +178,7 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
       }
       if (enumCfg.getValueColumn() == null) {
         enumCfg.setValueColumn(columns.getValue(0).getName());
-      } else if (enumCfg.getValueColumn() != columns.getValue(0).getName()) {
+      } else if (!enumCfg.getValueColumn().equals(columns.getValue(0).getName())) {
         throw new MojoFailureException(String.format("Only column does not match configured name column for enum %s.", enumCfg.getName()));
       }
     } else {
@@ -306,14 +306,9 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
         if (enumRepr.hasValue(escapedValue)) {
           throw new MojoFailureException(String.format("Duplicate enum entry '%s' for enum %s.", value, enumRepr.getName()));
         }
-        final Map<String, String> memberValues = new HashMap<String, String>();
+        final Map<String, String> memberValues = new HashMap<>();
         for (final MemberRepr member : enumRepr.getMembers()) {
-          final Object memberValue = result.getObject(member.getName());
-          if (memberValue == null) {
-            memberValues.put(member.getName(), String.format(columns.get(member.getName()).getType().getLiteralFormat(), "null"));
-          } else {
-            memberValues.put(member.getName(), String.format(columns.get(member.getName()).getType().getLiteralFormat(), memberValue.toString()));
-          }
+            memberValues.put(member.getName(), columns.get(member.getName()).getType().generateLiteral(result.getObject(member.getName())));
         }
         enumRepr.addValue(new ValueRepr(escapedValue, memberValues));
       }
@@ -322,7 +317,7 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
   }
 
   private LinkedMap<String, Column> readColumnsFromDB(final Connection connection, final EnumCfg enumCfg) throws SQLException {
-      final LinkedMap<String, Column> columns = new LinkedMap<String, Column>();
+      final LinkedMap<String, Column> columns = new LinkedMap<>();
       final DatabaseMetaData metaData = connection.getMetaData();
       try (ResultSet result = metaData.getColumns(null, this.generator.getDatabaseSchema(), enumCfg.getTable(), null)) {
         while (result.next()) {
