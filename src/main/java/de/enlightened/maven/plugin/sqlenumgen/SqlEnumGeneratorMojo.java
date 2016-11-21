@@ -123,6 +123,7 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
           enumNames = this.readEnumNamesFromDB(connection, enumCfg);
         }
         for (final String escapedEnumName : enumNames.keySet()) {
+          this.getLog().info(String.format("Generating enum \"%s\"", escapedEnumName));
           enumCfg.setName(enumNames.get(escapedEnumName));
           enumCfg.setEscapedName(escapedEnumName);
           final EnumRepr enumRepr = this.generateEnumRepr(connection, enumCfg, columns);
