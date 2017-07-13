@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Nicolai Ehemann (en@enlightened.de).
+ * Copyright (C) 2016-2017 Nicolai Ehemann (en@enlightened.de).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,12 @@ public class GeneratorCfg {
   private String databaseSchema;
 
   /**
+   * Visibility of enum attributes (if and only if visibility is private (default),
+   * getters will be generated for attributes)
+   */
+  private AttributeVisibility attributeVisibility = AttributeVisibility.PRIVATE;
+
+  /**
    * Target configuration
    */
   private TargetCfg target;
@@ -46,6 +52,18 @@ public class GeneratorCfg {
 
   public final void setDatabaseSchema(final String databaseSchema) {
     this.databaseSchema = databaseSchema;
+  }
+
+  public final AttributeVisibility getAttributeVisibility() {
+    return attributeVisibility;
+  }
+
+  public final void setAttributeVisibility(final AttributeVisibility attributeVisibility) {
+    this.attributeVisibility = attributeVisibility;
+  }
+
+  public final void setAttributeVisibility(final String attributeVisibility) {
+    this.attributeVisibility = AttributeVisibility.valueOf(attributeVisibility.toUpperCase());
   }
 
   public final TargetCfg getTarget() {
