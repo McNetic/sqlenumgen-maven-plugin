@@ -35,7 +35,6 @@ public class JDBCCfgTest {
 
   @Before
   public void setUp() throws SQLException, ClassNotFoundException{
-    Class.forName("org.h2.Driver");
     jdbc = new JDBCCfg();
   }
 

@@ -26,6 +26,12 @@ import java.sql.SQLException;
 public class JDBCCfg {
 
   /**
+   * The jdbc driver
+   * @since 0.0.4
+   */
+  private String driver;
+
+  /**
    * The database URL (required).
    * @since 0.0.1
    */
@@ -44,6 +50,14 @@ public class JDBCCfg {
   private String password;
 
   public JDBCCfg() {
+  }
+
+  public final String getDriver() {
+    return driver;
+  }
+
+  public final void setDriver(final String driver) {
+    this.driver = driver;
   }
 
   public final String getUrl() {
@@ -70,9 +84,12 @@ public class JDBCCfg {
     this.password = password;
   }
 
-  public final Connection getConnection() throws SQLException {
+  public final Connection getConnection() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
     final Connection connection;
 
+    if (this.driver != null) {
+      Class.forName(driver).newInstance();
+    }
     if (this.user != null) {
       connection = DriverManager.getConnection(this.url, this.user, this.password);
     } else {

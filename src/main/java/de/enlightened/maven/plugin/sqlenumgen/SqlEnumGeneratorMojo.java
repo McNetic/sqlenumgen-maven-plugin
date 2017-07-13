@@ -138,6 +138,10 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
       }
     } catch (SQLException exception) {
       throw new MojoFailureException("Mojo execution failed due to database error (" + exception.getMessage() + ").");
+    } catch (ClassNotFoundException exception) {
+      throw new MojoFailureException("Mojo execution failed due to missing database driver (" + exception.getMessage() + ").");
+    } catch (InstantiationException | IllegalAccessException exception) {
+      throw new MojoFailureException("Mojo execution failed due to database driver instantiation failure (" + exception.getMessage() + ").");
     }
   }
 
