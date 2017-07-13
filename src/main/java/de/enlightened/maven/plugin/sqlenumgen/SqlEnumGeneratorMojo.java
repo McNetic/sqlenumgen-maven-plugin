@@ -125,8 +125,7 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
         for (final String escapedEnumName : enumNames.keySet()) {
           this.getLog().info(String.format("Generating enum \"%s\"", escapedEnumName));
           enumCfg.setName(enumNames.get(escapedEnumName));
-          enumCfg.setEscapedName(escapedEnumName);
-          final EnumRepr enumRepr = this.generateEnumRepr(connection, enumCfg, columns);
+          final EnumRepr enumRepr = this.generateEnumRepr(connection, enumCfg, escapedEnumName, columns);
 
           final VelocityContext context = this.createContext(enumRepr);
 
@@ -139,6 +138,10 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
       }
     } catch (SQLException exception) {
       throw new MojoFailureException("Mojo execution failed due to database error (" + exception.getMessage() + ").");
+    } catch (ClassNotFoundException exception) {
+      throw new MojoFailureException("Mojo execution failed due to missing database driver (" + exception.getMessage() + ").");
+    } catch (InstantiationException | IllegalAccessException exception) {
+      throw new MojoFailureException("Mojo execution failed due to database driver instantiation failure (" + exception.getMessage() + ").");
     }
   }
 
@@ -290,8 +293,13 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
     return enumNames;
   }
 
-  private EnumRepr generateEnumRepr(final Connection connection, final EnumCfg enumCfg, final LinkedMap<String, Column> columns) throws MojoFailureException, SQLException {
-    final EnumRepr enumRepr = new EnumRepr(enumCfg.getEscapedName());
+  private EnumRepr generateEnumRepr(
+      final Connection connection,
+      final EnumCfg enumCfg,
+      final String escapedEnumName,
+      final LinkedMap<String, Column> columns
+  ) throws MojoFailureException, SQLException {
+    final EnumRepr enumRepr = new EnumRepr(escapedEnumName);
     for (final Column column : columns.values()) {
       enumRepr.addMember(column.getName(), column.getType());
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Nicolai Ehemann (en@enlightened.de).
+ * Copyright (C) 2016-2017 Nicolai Ehemann (en@enlightened.de).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,24 +26,38 @@ import java.sql.SQLException;
 public class JDBCCfg {
 
   /**
+   * The jdbc driver
+   * @since 0.0.4
+   */
+  private String driver;
+
+  /**
    * The database URL (required).
-   * @since 1.0
+   * @since 0.0.1
    */
   private String url;
 
   /**
    * The database user.
-   * @since 1.0
+   * @since 0.0.1
    */
   private String user;
 
   /**
    * The database password.
-   * @since 1.0
+   * @since 0.0.1
    */
   private String password;
 
   public JDBCCfg() {
+  }
+
+  public final String getDriver() {
+    return driver;
+  }
+
+  public final void setDriver(final String driver) {
+    this.driver = driver;
   }
 
   public final String getUrl() {
@@ -70,9 +84,12 @@ public class JDBCCfg {
     this.password = password;
   }
 
-  public final Connection getConnection() throws SQLException {
+  public final Connection getConnection() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
     final Connection connection;
 
+    if (this.driver != null) {
+      Class.forName(driver).newInstance();
+    }
     if (this.user != null) {
       connection = DriverManager.getConnection(this.url, this.user, this.password);
     } else {

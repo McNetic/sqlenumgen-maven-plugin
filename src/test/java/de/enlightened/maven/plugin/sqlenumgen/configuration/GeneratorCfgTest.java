@@ -15,9 +15,11 @@
  */
 package de.enlightened.maven.plugin.sqlenumgen.configuration;
 
-import org.junit.Before;
-import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  *
@@ -26,6 +28,9 @@ import static org.junit.Assert.*;
 public class GeneratorCfgTest {
 
   private GeneratorCfg generator;
+
+  @Rule
+  public final ExpectedException exception = ExpectedException.none();
 
   @Before
   public void setUp() {
@@ -50,5 +55,20 @@ public class GeneratorCfgTest {
     final TargetCfg target = new TargetCfg();
     this.generator.setTarget(target);
     assertSame("target is same", target, this.generator.getTarget());
+
+    this.generator.setAttributeVisibility(AttributeVisibility.PUBLIC);
+    assertSame("attributeVisibility is same", AttributeVisibility.PUBLIC, this.generator.getAttributeVisibility());
+
+    this.generator.setAttributeVisibility(AttributeVisibility.PUBLIC.name());
+    assertSame("attributeVisibility is same", AttributeVisibility.PUBLIC, this.generator.getAttributeVisibility());
+
+    this.generator.setAttributeVisibility(AttributeVisibility.PUBLIC.name().toLowerCase());
+    assertSame("attributeVisibility is same", AttributeVisibility.PUBLIC, this.generator.getAttributeVisibility());
+  }
+
+  @Test
+  public void testSetterFails() {
+    exception.expect(IllegalArgumentException.class);
+    this.generator.setAttributeVisibility("");
   }
 }

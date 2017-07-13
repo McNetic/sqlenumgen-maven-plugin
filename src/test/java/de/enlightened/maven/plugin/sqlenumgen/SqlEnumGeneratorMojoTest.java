@@ -59,6 +59,8 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
 
   public static final String JDBC_URL_CLOSE_DELAY = ";DB_CLOSE_DELAY=-1";
   public static final String JDBC_URL = "jdbc:h2:mem:test";
+  private static final String JDBC_NO_DRIVER = "no driver";
+  private static final String JDBC_NON_INSTANTIABLE_DRIVER = "java.lang.Class";
   private final static String EXPECTED_ENUM_PATH = "src/test/resources/expectedEnum.java";
 
   @SuppressWarnings("checkstyle:constantname")
@@ -129,7 +131,7 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
   }
 
   @Test
-  public void testExecuteFail() throws Exception {
+  public void testExecuteFailDBError() throws Exception {
     setupInMemoryMojo();
     mojo.setConfiguration(configuration);
 
@@ -141,6 +143,47 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
     configuration.getGenerator().setDatabase(database);
 
     exception.expect(MojoFailureException.class);
+    exception.expectMessage("Mojo execution failed due to database error (The url cannot be null).");
+    mojo.execute();
+  }
+
+  @Test
+  public void testExecuteFailDriverError() throws Exception {
+    setupInMemoryMojo();
+
+    configuration.getJdbc().setUrl(JDBC_URL);
+    configuration.getJdbc().setDriver(JDBC_NO_DRIVER);
+    mojo.setConfiguration(configuration);
+
+    final DatabaseCfg database = new DatabaseCfg();
+    final EnumCfg enm = new EnumCfg();
+    enm.setName("testEnum");
+    enm.setTable("TEST");
+    database.addEnum(enm);
+    configuration.getGenerator().setDatabase(database);
+
+    exception.expect(MojoFailureException.class);
+    exception.expectMessage("Mojo execution failed due to missing database driver (" + JDBC_NO_DRIVER + ").");
+    mojo.execute();
+  }
+
+  @Test
+  public void testExecuteFailDriverInstantiationError() throws Exception {
+    setupInMemoryMojo();
+
+    configuration.getJdbc().setUrl(JDBC_URL);
+    configuration.getJdbc().setDriver(JDBC_NON_INSTANTIABLE_DRIVER);
+    mojo.setConfiguration(configuration);
+
+    final DatabaseCfg database = new DatabaseCfg();
+    final EnumCfg enm = new EnumCfg();
+    enm.setName("testEnum");
+    enm.setTable("TEST");
+    database.addEnum(enm);
+    configuration.getGenerator().setDatabase(database);
+
+    exception.expect(MojoFailureException.class);
+    exception.expectMessage("Mojo execution failed due to database driver instantiation failure (Can not call newInstance() on the Class for " + JDBC_NON_INSTANTIABLE_DRIVER + ").");
     mojo.execute();
   }
 

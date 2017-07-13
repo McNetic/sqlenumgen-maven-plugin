@@ -23,11 +23,13 @@ public class TargetCfg {
 
   /**
    * Package name of the generated enums
+   * @since 0.0.1
    */
   private String pkg;
 
   /**
    * The output directory for the generated classes
+   * @since 0.0.1
    */
   private String directory;
 
