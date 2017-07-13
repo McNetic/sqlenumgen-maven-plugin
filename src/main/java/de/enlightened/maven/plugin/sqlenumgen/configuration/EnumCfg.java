@@ -30,12 +30,6 @@ public class EnumCfg {
   private String name;
 
   /**
-   * The escaped enum name
-   * @since 0.0.2
-   */
-  private String escapedName;
-
-  /**
    * The column to generate the enum name from
    * @since 0.0.1
    */
@@ -60,16 +54,8 @@ public class EnumCfg {
     return this.name;
   }
 
-  public final String getEscapedName() {
-    return escapedName;
-  }
-
   public final void setName(final String name) {
     this.name = name;
-  }
-
-  public final void setEscapedName(final String escapedName) {
-    this.escapedName = escapedName;
   }
 
   public final String getNameColumn() {
@@ -104,7 +90,6 @@ public class EnumCfg {
   public final int hashCode() {
     int hash = HASH_BASE;
     hash = HASH_FACTOR * hash + Objects.hashCode(this.name);
-    hash = HASH_FACTOR * hash + Objects.hashCode(this.escapedName);
     hash = HASH_FACTOR * hash + Objects.hashCode(this.nameColumn);
     hash = HASH_FACTOR * hash + Objects.hashCode(this.table);
     hash = HASH_FACTOR * hash + Objects.hashCode(this.valueColumn);
@@ -126,9 +111,6 @@ public class EnumCfg {
     if (!Objects.equals(this.name, other.name)) {
       return false;
     }
-    if (!Objects.equals(this.escapedName, other.escapedName)) {
-      return false;
-    }
     if (!Objects.equals(this.nameColumn, other.nameColumn)) {
       return false;
     }
@@ -143,6 +125,6 @@ public class EnumCfg {
 
   @Override
   public final String toString() {
-    return "EnumCfg{" + "name=" + name + ", escapedName=" + escapedName + ", nameColumn=" + nameColumn + ", table=" + table + ", valueColumn=" + valueColumn + "}";
+    return "EnumCfg{" + "name=" + name + ", nameColumn=" + nameColumn + ", table=" + table + ", valueColumn=" + valueColumn + "}";
   }
 }
