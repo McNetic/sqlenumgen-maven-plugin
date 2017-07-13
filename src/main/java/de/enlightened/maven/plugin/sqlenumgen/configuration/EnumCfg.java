@@ -25,26 +25,31 @@ public class EnumCfg {
 
   /**
    * The enum name
+   * @since 0.0.1
    */
   private String name;
 
   /**
    * The escaped enum name
+   * @since 0.0.2
    */
   private String escapedName;
 
   /**
    * The column to generate the enum name from
+   * @since 0.0.1
    */
   private String nameColumn;
 
   /**
-   * The database table to generate the enum from
+   * The database table to generate the enum from (required)
+   * @since 0.0.1
    */
   private String table;
 
   /**
    * The column to generate the enum value from
+   * @since 0.0.2
    */
   private String valueColumn;
 

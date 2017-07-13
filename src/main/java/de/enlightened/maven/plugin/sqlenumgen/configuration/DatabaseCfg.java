@@ -26,6 +26,7 @@ public class DatabaseCfg {
 
   /**
    * The enum(s) to generate
+   * @since 0.0.1
    */
   private final List<EnumCfg> enums = new ArrayList<EnumCfg>();
 

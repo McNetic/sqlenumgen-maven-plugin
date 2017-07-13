@@ -22,23 +22,27 @@ package de.enlightened.maven.plugin.sqlenumgen.configuration;
 public class GeneratorCfg {
 
   /**
-   * The database schema
+   * The database schema (required)
+   * @since 0.0.1
    */
   private String databaseSchema;
 
   /**
    * Visibility of enum attributes (if and only if visibility is private (default),
    * getters will be generated for attributes)
+   * @since 0.0.4
    */
   private AttributeVisibility attributeVisibility = AttributeVisibility.PRIVATE;
 
   /**
    * Target configuration
+   * @since 0.0.1
    */
   private TargetCfg target;
 
   /**
    * The database configuration
+   * @since 0.0.1
    */
   private DatabaseCfg database;
 
