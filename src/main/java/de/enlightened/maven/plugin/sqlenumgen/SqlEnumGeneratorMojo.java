@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Nicolai Ehemann (en@enlightened.de).
+ * Copyright (C) 2016-2017 Nicolai Ehemann (en@enlightened.de).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package de.enlightened.maven.plugin.sqlenumgen;
 
-import de.enlightened.maven.plugin.sqlenumgen.util.Column;
+import de.enlightened.maven.plugin.sqlenumgen.configuration.AttributeVisibility;
 import de.enlightened.maven.plugin.sqlenumgen.configuration.Configuration;
 import de.enlightened.maven.plugin.sqlenumgen.configuration.EnumCfg;
 import de.enlightened.maven.plugin.sqlenumgen.configuration.GeneratorCfg;
@@ -23,6 +23,7 @@ import de.enlightened.maven.plugin.sqlenumgen.configuration.JDBCCfg;
 import de.enlightened.maven.plugin.sqlenumgen.repr.EnumRepr;
 import de.enlightened.maven.plugin.sqlenumgen.repr.MemberRepr;
 import de.enlightened.maven.plugin.sqlenumgen.repr.ValueRepr;
+import de.enlightened.maven.plugin.sqlenumgen.util.Column;
 import de.enlightened.maven.plugin.sqlenumgen.util.SqlType;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -42,7 +43,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.collections4.map.LinkedMap;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -233,11 +233,16 @@ public class SqlEnumGeneratorMojo extends AbstractMojo {
     context.put("version", CONFIGURATION.PROJECT_VERSION);
     context.put("url", CONFIGURATION.PROJECT_URL);
 
+    // constants
+    context.put("ATTRIBUTE_VISIBILITY_PUBLIC", AttributeVisibility.PUBLIC);
+    context.put("ATTRIBUTE_VISIBILITY_PRIVATE", AttributeVisibility.PRIVATE);
+
     // build specific properties
     context.put("date", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
 
     // project configuration
     context.put("package", this.generator.getTarget().getPackage());
+    context.put("attributeVisibility", this.generator.getAttributeVisibility());
 
     // database-generated properties
     context.put("schema-version", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));

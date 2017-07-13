@@ -47,7 +47,7 @@ public enum $enum.Name {
 #if($enum.hasMembers())
 #foreach($member in $enum.members)
 
-  private final $member.javaClass $member.name;
+  ${attributeVisibility.name().toLowerCase()} final $member.javaClass $member.name;
 #end
 
 #end
@@ -56,10 +56,12 @@ public enum $enum.Name {
     this.$member.name = $member.name;
 #end
   }
+#if($attributeVisibility == $ATTRIBUTE_VISIBILITY_PRIVATE)
 #foreach($member in $enum.members)
 
   public final $member.javaClass get${display.capitalize($member.name)}() {
     return this.$member.name;
   }
+#end
 #end
 }
