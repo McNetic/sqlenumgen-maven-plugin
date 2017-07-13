@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Nicolai Ehemann (en@enlightened.de).
+ * Copyright (C) 2016-2017 Nicolai Ehemann (en@enlightened.de).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@ public class Configuration {
 
   /**
    * JDBC connection specification
-   * @since 1.0
+   * @since 0.0.1
    */
   private JDBCCfg jdbc;
 
   /**
    * Configuration of the enum generator
-   * @since 1.0
+   * @since 0.0.1
    */
   private GeneratorCfg generator;
 

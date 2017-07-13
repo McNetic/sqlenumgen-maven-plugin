@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Nicolai Ehemann (en@enlightened.de).
+ * Copyright (C) 2016-2017 Nicolai Ehemann (en@enlightened.de).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,19 +27,19 @@ public class JDBCCfg {
 
   /**
    * The database URL (required).
-   * @since 1.0
+   * @since 0.0.1
    */
   private String url;
 
   /**
    * The database user.
-   * @since 1.0
+   * @since 0.0.1
    */
   private String user;
 
   /**
    * The database password.
-   * @since 1.0
+   * @since 0.0.1
    */
   private String password;
 
