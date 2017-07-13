@@ -23,7 +23,6 @@ import de.enlightened.maven.plugin.sqlenumgen.configuration.EnumCfg;
 import de.enlightened.maven.plugin.sqlenumgen.util.Column;
 import de.enlightened.maven.plugin.sqlenumgen.util.SqlType;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -33,7 +32,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.maven.plugin.MojoFailureException;
@@ -107,22 +105,26 @@ public class SqlEnumGeneratorMojoTest extends AbstractMojoTestCase {
         .getPath(EXPECTED_ENUM_PATH).toAbsolutePath();
     final String expectedEnumClass = new String(Files.readAllBytes(expectedEnumPath));
 
-    final int beforeVersionPos = expectedEnumClass.indexOf("sqlenumgen version") + 18;
-    final int afterVersionPos = beforeVersionPos + SqlEnumGeneratorMojo.CONFIGURATION.PROJECT_VERSION.length() + 2;
-    final int beforeDatePos = expectedEnumClass.indexOf("date") + 7;
-    final int afterDatePos = beforeDatePos + 26;
+    final int beforeVersionPosExpected = expectedEnumClass.indexOf("sqlenumgen version") + 18;
+    final int afterVersionPosExpected = beforeVersionPosExpected + 7;
+    final int beforeDatePosExpected = expectedEnumClass.indexOf("date = ") + 7;
+    final int afterDatePosExpected = beforeDatePosExpected + 26;
+    final int beforeVersionPosGenerated = generatedEnumClass.indexOf("sqlenumgen version") + 18;
+    final int afterVersionPosGenerated = beforeVersionPosGenerated + SqlEnumGeneratorMojo.CONFIGURATION.PROJECT_VERSION.length() + 2;
+    final int beforeDatePosGenerated = generatedEnumClass.indexOf("date = ") + 7;
+    final int afterDatePosGenerated = beforeDatePosGenerated + 26;
     assertEquals("Generated enum class",
-        expectedEnumClass.substring(0, beforeVersionPos)
-            + expectedEnumClass.substring(afterVersionPos, beforeDatePos)
-            + expectedEnumClass.substring(afterDatePos),
-        generatedEnumClass.substring(0, beforeVersionPos)
-            + generatedEnumClass.substring(afterVersionPos, beforeDatePos)
-            + generatedEnumClass.substring(afterDatePos));
+        expectedEnumClass.substring(0, beforeVersionPosExpected)
+            + expectedEnumClass.substring(afterVersionPosExpected, beforeDatePosExpected)
+            + expectedEnumClass.substring(afterDatePosExpected),
+        generatedEnumClass.substring(0, beforeVersionPosGenerated)
+            + generatedEnumClass.substring(afterVersionPosGenerated, beforeDatePosGenerated)
+            + generatedEnumClass.substring(afterDatePosGenerated));
     assertEquals("Generated enum sqlenumgen version",
         SqlEnumGeneratorMojo.CONFIGURATION.PROJECT_VERSION,
-        generatedEnumClass.substring(beforeVersionPos + 1, afterVersionPos - 1));
+        generatedEnumClass.substring(beforeVersionPosGenerated + 1, afterVersionPosGenerated - 1));
     assertTrue("Generated enum date",
-        generatedEnumClass.substring(beforeDatePos + 1, afterDatePos - 1)
+        generatedEnumClass.substring(beforeDatePosGenerated + 1, afterDatePosGenerated - 1)
             .matches("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z"));
   }
 
