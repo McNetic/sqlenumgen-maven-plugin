@@ -12,7 +12,7 @@ import javax.annotation.Generated;
  */
 @Generated(
     value = {
-        "https://github.com/McNetic/sqlenumgen",
+        "https://github.com/McNetic/sqlenumgen-maven-plugin",
         "sqlenumgen version:0.1.0",
     },
     date = "2016-09-30T23:27:40.391Z",
